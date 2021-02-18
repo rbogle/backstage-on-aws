@@ -8,14 +8,22 @@ It deploys the container into an ECS Fargate cluster and uses an Aurora postgres
 
 ## Basic Steps
 
-- Check your Prerequisites
-- Clone/Fork this Repo
-- Build a backstage app
-- Create a dockerfile 
-- Configure app to use ENV vars
-- Create a dotenv file 
-- Create a Route53 public hosted zone
-- Initialize the CDK project
+- [Deploy Backstage on AWS ECS Fargate and Aurora Postgres](#deploy-backstage-on-aws-ecs-fargate-and-aurora-postgres)
+  - [Basic Steps](#basic-steps)
+  - [Check your prerequisites](#check-your-prerequisites)
+  - [Clone or Fork this Repo](#clone-or-fork-this-repo)
+  - [Integrate, Link, or Reference to a Backstage App](#integrate-link-or-reference-to-a-backstage-app)
+    - [Integrate](#integrate)
+    - [Link](#link)
+    - [Reference](#reference)
+  - [Add Dockerfile and .dockerignore](#add-dockerfile-and-dockerignore)
+  - [Configure Backstage to use Env vars](#configure-backstage-to-use-env-vars)
+  - [Create .env file](#create-env-file)
+    - [Postgres config](#postgres-config)
+    - [Routing & Discovery](#routing--discovery)
+    - [AWS Environment](#aws-environment)
+  - [Create a Route53 publichostedzone](#create-a-route53-publichostedzone)
+  - [Initialize CDK project](#initialize-cdk-project)
 
 ## Check your prerequisites
 Install all the things
