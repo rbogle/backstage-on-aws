@@ -4,27 +4,27 @@ This project uses [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) 
 
 It deploys the container into an ECS Fargate cluster and uses an Aurora postgres db for persistence, and puts those behind a application load balancer with a custom domain name.
 
-> Warning! Deploying this into your AWS will incur costs! 
+> Warning! Deploying this into your AWS account will incur costs! 
 
 ## Basic Steps
 
-* Check your Prerequisites
-* Clone/Fork this Repo
-* Build a backstage app
-* Create a dockerfile 
-* Configure app to use ENV vars
-* Create a dotenv file 
-* Initialize the CDK project
+- Check your Prerequisites
+- Clone/Fork this Repo
+- Build a backstage app
+- Create a dockerfile 
+- Configure app to use ENV vars
+- Create a dotenv file 
+- Initialize the CDK project
 
 ## Check your prerequisites
 Install all the things
 
-* docker
-* node 
-* yarn
-* python
-* aws cli
-* aws cdk
+- docker
+- node 
+- yarn
+- python
+- aws cli
+- aws cdk
 
 ## Clone or Fork this Repo
 You know what to do! :)
@@ -63,23 +63,23 @@ Create a dotenv file `.env` in the root of this project with your secrets and pa
 The essential variables to define are:
 
 ### Postgres config
-* POSTGRES_PORT --> (Optional) defaults to 5432
-* POSTGRES_DB --> (Optional) no default lets backstage define
-* POSTGRES_USER --> (Optional) defaults to 'postgres'
-* POSTGRES_PASSWORD --> Not needed, will get generated and set on the fly
+- POSTGRES_PORT --> (Optional) defaults to 5432
+- POSTGRES_DB --> (Optional) no default lets backstage define
+- POSTGRES_USER --> (Optional) defaults to 'postgres'
+- POSTGRES_PASSWORD --> Not needed, will get generated and set on the fly
 
 ### Routing & Discovery
-* HOST_NAME --> (Optional) defaults to backstage
-* DOMAIN_NAME --> (Required) defaults to example.com
-* CONTAINER_PORT --> (Optional) defaults to 7000
+- HOST_NAME --> (Optional) defaults to backstage
+- DOMAIN_NAME --> (Required) defaults to example.com
+- CONTAINER_PORT --> (Optional) defaults to 7000
 
 ### AWS Environment
-* AWS_REGION --> (Optional) defaults to 'us-east-1'
-* AWS_ACCOUNT --> (Required) no default
-* ACM_ARN --> (Optional) no default if left empty will generate a new cert
-* TAG_STACK_NAME --> (Optional) defaults to backstage
-* TAG_STACK_AUTHOR --> (Optional) defaults to foo.bar@example.com
-* BACKSTAGE_DIR --> (Optional) defaults to ./backstage
+- AWS_REGION --> (Optional) defaults to 'us-east-1'
+- AWS_ACCOUNT --> (Required) no default
+- ACM_ARN --> (Optional) no default if left empty will generate a new cert
+- TAG_STACK_NAME --> (Optional) defaults to backstage
+- TAG_STACK_AUTHOR --> (Optional) defaults to foo.bar@example.com
+- BACKSTAGE_DIR --> (Optional) defaults to ./backstage
 
 
 ## Initialize CDK project
