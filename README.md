@@ -31,8 +31,7 @@ You know what to do! :)
 
 
 ## Integrate, Link, or Reference to a Backstage App
-The CDK deployment needs to find the backstage app code and its dockerfile to build and push an image for deployment.  
-It defaults to looking in `./backstage`. 
+The CDK deployment needs to find the backstage app code and its dockerfile to build and push an image for deployment. It defaults to looking in `./backstage`. 
 
 ### Integrate
 If you want to couple this with your custom backstage application you can create or move the backstage code here.
@@ -52,7 +51,7 @@ Finally, if you set the env var `BACKSTAGE_DIR` to point to where your backstage
 
 
 ## Add Dockerfile and .docker ignore
-Add a dockerfile to the backstage dir as detailed from from [backstage docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
+Add a dockerfile to the backstage dir as detailed from the [backstage deployment docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
 
 
 ## Configure Backstage to use Env vars
