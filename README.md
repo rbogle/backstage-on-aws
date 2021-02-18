@@ -4,7 +4,7 @@ This project uses [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) 
 
 It deploys the container into an ECS Fargate cluster and uses an Aurora postgres db for persistence, and puts those behind a application load balancer with a custom domain name.
 
-Warning! Deploying this into your AWS will incur costs! 
+> Warning! Deploying this into your AWS will incur costs! 
 
 ## Basic Steps
 
