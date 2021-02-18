@@ -21,6 +21,7 @@ class BackstageStack(core.Stack):
         host_name = props.get("HOST_NAME", 'backstage')
         domain_name = props.get("DOMAIN_NAME", 'example.com')
         db_username = props.get("POSTGRES_USER", 'postgres')
+        db_port = int(props.get("POSTGRES_PORT", 5432))
         container_port = props.get("CONTAINER_PORT", '7000')
         backstage_dir = props.get("BACKSTAGE_DIR", 'backstage')
         acm_arn = props.get("ACM_ARN", None)
@@ -104,7 +105,7 @@ class BackstageStack(core.Stack):
 
         # default egress rules are for any, so we just need an ingress rule
         # to allow fargate to reach the aurora cluster and protect its access from elsewhere
-        aurora_sg.add_ingress_rule(peer=fargate_sg, connection=ec2.Port.tcp(5432))
+        aurora_sg.add_ingress_rule(peer=fargate_sg, connection=ec2.Port.tcp(db_port))
 
         aurora_instance = rds.InstanceProps(
             vpc=vpc,

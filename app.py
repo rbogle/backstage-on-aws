@@ -7,7 +7,7 @@ from infra.backstage import BackstageStack
 props = dotenv_values()
 
 # Using a hosted dns zone requires specifying account and region 
-env =core.Environment(account=props.get('AWS_ACCOUNT'), region=props.get('AWS_REGION'))
+env =core.Environment(account=props.get('AWS_ACCOUNT'), region=props.get('AWS_REGION', 'us-east-1'))
 
 app = core.App()
 backstage = BackstageStack(app, "backstage", props, env=env)
