@@ -23,11 +23,15 @@ class BackstageStack(core.Stack):
         db_username = props.get("POSTGRES_USER", 'postgres')
         db_port = int(props.get("POSTGRES_PORT", 5432))
         container_port = props.get("CONTAINER_PORT", '7000')
-        backstage_dir = props.get("BACKSTAGE_DIR", 'backstage')
+        backstage_dir = props.get("BACKSTAGE_DIR", './backstage')
         acm_arn = props.get("ACM_ARN", None)
         fqdn = f"{host_name}.{domain_name}"
 
         # hosted zone for ALB and Cert
+        # hosted_zone = route53.PublicHostedZone(
+        #     self, "HostedZone",
+        #     zone_name=domain_name
+        # )
         # we already have a domain registered and zone hosted in Route53
         # so we do a lookup
         hosted_zone = route53.HostedZone.from_lookup(

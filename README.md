@@ -66,7 +66,8 @@ The essential variables to define are:
 - POSTGRES_PORT --> (Optional) defaults to 5432
 - POSTGRES_DB --> (Optional) no default lets backstage define
 - POSTGRES_USER --> (Optional) defaults to 'postgres'
-- POSTGRES_PASSWORD --> Not needed, will get generated and set on the fly
+- POSTGRES_PASSWORD --> (Optional) Not needed, will get generated and over-written on the fly
+- POSTGRES_HOST --> (Optional) Not needed, will get generated and over-written on the fly
 
 ### Routing & Discovery
 - HOST_NAME --> (Optional) defaults to backstage
@@ -83,7 +84,7 @@ The essential variables to define are:
 
 
 ## Initialize CDK project
-This project is set up like a standard Python project.  The initialization
+This project is set up like a standard Python CDK project.  The initialization
 process also creates a virtualenv within this project, stored under the `.venv`
 directory.  To create the virtualenv it assumes that there is a `python3`
 (or `python` for Windows) executable in your path with access to the `venv`
