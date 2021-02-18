@@ -1,6 +1,7 @@
 
 # Deploy Backstage on AWS ECS Fargate
-This project uses [CDK]() to deploy a containerized version of backstage along with the required infrastructure in AWS, to host your own Backstage service.    
+This project uses [CDK]() to deploy a containerized version of backstage along with the required infrastructure in AWS, to host your own [Backstage](https://backstage.io) service.
+
 It deploys the container into an ECS Fargate cluster and uses an Aurora postgres db for persistence, and puts those behind a application load balancer with a custom domain name.
 
 Warning! Deploying this into your AWS will incur costs! 
@@ -34,12 +35,14 @@ The CDK deployment needs to find the backstage app code and its dockerfile to bu
 It defaults to looking in `./backstage`. 
 
 ### Integrate
-If you want to couple this with your custom backstage application you can create or move the backstage code here.  
-Either copy or build a backstage app with postgres using `npx @backstage\create-app` into a `./backstage` sub directory in this repo. See this [guide]() at Backstage.io.  
+If you want to couple this with your custom backstage application you can create or move the backstage code here.
+
+Either copy or build a backstage app with postgres using `npx @backstage\create-app` into a `./backstage` sub directory in this repo. See this [guide]() at Backstage.io.
+
 If you do this and then want to commit changes to your backstage app along with this infrastructure code you will need to remove the `backstage` line from gitignore.  
 
 ### Link
-Alternatively, you can keep these separate and create a symlink from `backstage` to a external directory containing the backstage app code.  
+Alternatively, you can keep these separate and create a symlink from `./backstage` to a external directory containing the backstage app code.  
 ```
 # ln -s backstage ../my-backstage-app-path 
 ```
@@ -49,7 +52,7 @@ Finally, if you set the env var `BACKSTAGE_DIR` to point to where your backstage
 
 
 ## Add Dockerfile and .docker ignore
-Add a dockerfile to the backstage dir from [backstage docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
+Add a dockerfile to the backstage dir as detailed from from [backstage docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
 
 
 ## Configure Backstage to use Env vars
@@ -63,7 +66,8 @@ The essential variables to define are:
 ### Postgres config
 * POSTGRES_PORT --> (Optional) defaults to 5432
 * POSTGRES_DB --> (Optional) no default lets backstage define
-* POSTGRES_USER --> defaults to 'postgres'
+* POSTGRES_USER --> (Optional) defaults to 'postgres'
+* POSTGRES_PASSWORD --> Not needed, will get generated and set on the fly
 
 ### Routing & Discovery
 * HOST_NAME --> (Optional) defaults to backstage
@@ -117,17 +121,10 @@ At this point you can now synthesize the CloudFormation template for this code.
 ```
 $ cdk synth
 ```
+Finally, assuming no errors from synth, and you have set your env vars, you can deploy:
 
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
-
-## Useful commands
-
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
+```
+$ cdk deploy
+```
 
 Enjoy!
