@@ -1,10 +1,44 @@
 
-# Welcome to your CDK Python project!
+# Welcome Backstage deploy on AWS ECS Fargate
 
-This is a blank project for Python development with CDK.
+## Basic Steps
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+* Check your Prerequisites
+* Clone this Repo
+* Build a backstage app
+* Create a dockerfile 
+* Configure app to use ENV vars
+* Create a dotenv file 
+* Initialize the CDK project
 
+## Check your prerequisites
+Install all the things
+
+* docker
+* node 
+* yarn
+* python
+* aws cli
+* aws cdk
+
+## Clone this Rep
+
+## Create or Link to a Backstage App
+Build a backstage app with postgres using `npx @backstage\create-app`. into a `backstage` sub directory in this repo.  
+If you do this and then want to commit changes to your backstage app along with this deployment / infrastructure code you should remove the `backstage` line from gitignore.
+or
+Create a symlink from `backstage` to a external directory containing the backstage app code. 
+
+## Add Dockerfile and .docker ignore
+Add a dockerfile to the backstage dir from [backstage docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
+
+## Configure Backstage to use Env vars
+Configure your `app-config.yaml` and `app-config.production.yaml` files to use ENV vars for critical parameters and secrets
+
+## Create .env file
+Create a dotenv file `.env` in the root of this project with your secrets and parameters 
+
+## Initialize CDK project
 This project is set up like a standard Python project.  The initialization
 process also creates a virtualenv within this project, stored under the `.venv`
 directory.  To create the virtualenv it assumes that there is a `python3`

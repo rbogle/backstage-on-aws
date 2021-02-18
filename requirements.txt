@@ -1,1 +1,10 @@
--e .
+python-dotenv
+aws_cdk.core
+aws_cdk.aws_ec2
+aws_cdk.aws_ecs
+aws_cdk.aws_ecs_patterns
+aws_cdk.aws_rds
+aws_cdk.aws_certificatemanager
+aws_cdk.aws_route53
+aws_cdk.aws_secretsmanager
+aws_cdk.aws_ssm
