@@ -1,4 +1,5 @@
 
+<!-- omit in toc -->
 # Deploy Backstage on AWS ECS Fargate and Aurora Postgres
 This project uses [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) to deploy a containerized version of backstage along with the required infrastructure in AWS, to host your own [Backstage](https://backstage.io) service.
 
@@ -6,24 +7,23 @@ It deploys the container into an ECS Fargate cluster and uses an Aurora postgres
 
 > Warning! Deploying this into your AWS account will incur costs! 
 
+<!-- omit in toc -->
 ## Basic Steps
 
-- [Deploy Backstage on AWS ECS Fargate and Aurora Postgres](#deploy-backstage-on-aws-ecs-fargate-and-aurora-postgres)
-  - [Basic Steps](#basic-steps)
-  - [Check your prerequisites](#check-your-prerequisites)
-  - [Clone or Fork this Repo](#clone-or-fork-this-repo)
-  - [Integrate, Link, or Reference to a Backstage App](#integrate-link-or-reference-to-a-backstage-app)
-    - [Integrate](#integrate)
-    - [Link](#link)
-    - [Reference](#reference)
-  - [Add Dockerfile and .dockerignore](#add-dockerfile-and-dockerignore)
-  - [Configure Backstage to use Env vars](#configure-backstage-to-use-env-vars)
-  - [Create .env file](#create-env-file)
-    - [Postgres config](#postgres-config)
-    - [Routing & Discovery](#routing--discovery)
-    - [AWS Environment](#aws-environment)
-  - [Create a Route53 publichostedzone](#create-a-route53-publichostedzone)
-  - [Initialize CDK project](#initialize-cdk-project)
+- [Check your prerequisites](#check-your-prerequisites)
+- [Clone or Fork this Repo](#clone-or-fork-this-repo)
+- [Integrate, Link, or Reference to a Backstage App](#integrate-link-or-reference-to-a-backstage-app)
+  - [Integrate](#integrate)
+  - [Link](#link)
+  - [Reference](#reference)
+- [Add Dockerfile and .dockerignore](#add-dockerfile-and-dockerignore)
+- [Configure Backstage to use Env vars](#configure-backstage-to-use-env-vars)
+- [Create .env file](#create-env-file)
+  - [Postgres config](#postgres-config)
+  - [Routing & Discovery](#routing--discovery)
+  - [AWS Environment](#aws-environment)
+- [Create a Route53 publichostedzone](#create-a-route53-publichostedzone)
+- [Initialize and Deploy CDK project](#initialize-and-deploy-cdk-project)
 
 ## Check your prerequisites
 Install all the things
@@ -96,7 +96,7 @@ The cdk stack assumes a pre-existing domain name and hosted zone in route53.
 
 You can change this to generate one on the fly if the domain is registered with AWS already, however its just as easy to setup a new hosted zone via the console. see: [Route53 docs](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)
 
-## Initialize CDK project
+## Initialize and Deploy CDK project
 This project is set up like a standard Python CDK project.  The initialization
 process also creates a virtualenv within this project, stored under the `.venv`
 directory.  To create the virtualenv it assumes that there is a `python3`
