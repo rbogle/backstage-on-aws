@@ -50,8 +50,8 @@ Alternatively, you can keep these separate and create a symlink from `./backstag
 Finally, if you set the env var `BACKSTAGE_DIR` to point to where your backstage app code lives, cdk will pick up that path.
 
 
-## Add Dockerfile and .docker ignore
-Add a dockerfile to the backstage dir as detailed from the [backstage deployment docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
+## Add Dockerfile and .dockerignore
+Add a dockerfile (and a `.dockerignore`) to the backstage dir as detailed from the [backstage deployment docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
 
 
 ## Configure Backstage to use Env vars
