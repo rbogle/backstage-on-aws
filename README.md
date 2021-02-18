@@ -14,6 +14,7 @@ It deploys the container into an ECS Fargate cluster and uses an Aurora postgres
 - Create a dockerfile 
 - Configure app to use ENV vars
 - Create a dotenv file 
+- Create a Route53 public hosted zone
 - Initialize the CDK project
 
 ## Check your prerequisites
@@ -82,6 +83,10 @@ The essential variables to define are:
 - TAG_STACK_AUTHOR --> (Optional) defaults to foo.bar@example.com
 - BACKSTAGE_DIR --> (Optional) defaults to ./backstage
 
+## Create a Route53 publichostedzone
+The cdk stack assumes a pre-existing domain name and hosted zone in route53.
+
+You can change this to generate one on the fly if the domain is registered with AWS already, however its just as easy to setup a new hosted zone via the console. see: [Route53 docs](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)
 
 ## Initialize CDK project
 This project is set up like a standard Python CDK project.  The initialization
