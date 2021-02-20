@@ -28,12 +28,12 @@ This project assumes you have more than a passing familiarity with Python, AWS, 
 - [Initialize and Deploy CDK project](#initialize-and-deploy-cdk-project)
 
 ## Check your prerequisites
-Install all the things
+Install all the things....
 
 - docker
 - node 
 - yarn
-- python
+- python3
 - aws cli
 - aws cdk
 
@@ -42,23 +42,23 @@ You know what to do! :)
 
 
 ## Integrate, Link, or Reference to a Backstage App
-The CDK deployment needs to find the backstage app code and its dockerfile to build and push an image for deployment. It defaults to looking in `./backstage`. 
+The CDK deployment needs to find the backstage app code and its dockerfile to build and push an image for deployment. It defaults to looking locally in `./backstage`. There a several options acheiving this:
 
 ### Integrate
-If you want to couple this with your custom backstage application you can create or move the backstage code here.
+If you want to couple this cdk stack with your custom backstage application you can create or move your backstage code here.
 
 Either copy or build a backstage app with postgres using `npx @backstage\create-app` into a `./backstage` sub directory in this repo. See this [guide](https://backstage.io/docs/getting-started/create-an-app) at [Backstage.io](https://backstage.io/).
 
-If you do this and then want to commit changes to your backstage app along with this infrastructure code you will need to remove the `backstage` line from gitignore.  
+> Note: If you do this and then want to commit changes to your backstage app along with this infrastructure code you will need to remove the `backstage` line from gitignore.  
 
 ### Link
-Alternatively, you can keep these separate and create a symlink to `./backstage` from an external directory containing the backstage app code.  
+Alternatively, you can keep these repos separate and create a symlink to `./backstage` from an external directory containing the backstage app code.  
 ```
 # ln -s ../my-backstage-app-path backstage  
 ```
 
 ### Reference
-Finally, if you set the env var `BACKSTAGE_DIR` to point to where your backstage app code lives, cdk will pick up that path.
+Finally, if you set an env var `BACKSTAGE_DIR` to point to where your backstage app code lives, cdk deploy will pick up that path for the container build.
 
 
 ## Add Dockerfile and .dockerignore
@@ -95,7 +95,7 @@ Create a dotenv file `.env` in the root of this project with your secrets and pa
 ## Create a Route53 publichostedzone
 The cdk stack assumes a pre-existing domain name and hosted zone in route53.
 
-You can change this to generate one on the fly if the domain is registered with AWS already, however its just as easy to setup a new hosted zone via the console. see: [Route53 docs](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)
+You can change the cdk stack to generate one on the fly if the domain is registered with AWS already, however its just as easy to setup a new hosted zone via the console. see: [Route53 docs](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)
 
 ## Initialize and Deploy CDK project
 This project is set up like a standard Python CDK project.  The initialization
@@ -135,7 +135,7 @@ At this point you can now synthesize the CloudFormation template for this code.
 ```
 $ cdk synth
 ```
-Finally, assuming no errors from synth, and you have set your env vars, you can deploy:
+Finally, assuming no errors from synth, and you have set your env vars in a `.env` file, you can deploy:
 
 ```
 $ cdk deploy
