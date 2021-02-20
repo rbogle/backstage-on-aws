@@ -50,9 +50,9 @@ Either copy or build a backstage app with postgres using `npx @backstage\create-
 If you do this and then want to commit changes to your backstage app along with this infrastructure code you will need to remove the `backstage` line from gitignore.  
 
 ### Link
-Alternatively, you can keep these separate and create a symlink from `./backstage` to a external directory containing the backstage app code.  
+Alternatively, you can keep these separate and create a symlink to `./backstage` from an external directory containing the backstage app code.  
 ```
-# ln -s backstage ../my-backstage-app-path 
+# ln -s ../my-backstage-app-path backstage  
 ```
 
 ### Reference
@@ -68,8 +68,7 @@ Configure your `app-config.yaml` and `app-config.production.yaml` files to use E
 
 
 ## Create .env file
-Create a dotenv file `.env` in the root of this project with your secrets and parameters to configure both the CDK deployment and to pass them to your backstage app container at runtime.
-The essential variables to define are:
+Create a dotenv file `.env` in the root of this project with your secrets and parameters to configure both the CDK deployment and to pass them to your backstage app container at runtime. Below are the variables used by cdk, add any others you want your backstage runtime to have. The essential variables for CDK deployment to define are:
 
 ### Postgres config
 - POSTGRES_PORT --> (Optional) defaults to 5432
@@ -86,7 +85,7 @@ The essential variables to define are:
 ### AWS Environment
 - AWS_REGION --> (Optional) defaults to 'us-east-1'
 - AWS_ACCOUNT --> (Required) no default
-- ACM_ARN --> (Optional) no default if left empty will generate a new cert
+- ACM_ARN --> (Optional) no default, if left empty will generate a new cert
 - TAG_STACK_NAME --> (Optional) defaults to backstage
 - TAG_STACK_AUTHOR --> (Optional) defaults to foo.bar@example.com
 - BACKSTAGE_DIR --> (Optional) defaults to ./backstage
