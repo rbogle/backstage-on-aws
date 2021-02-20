@@ -73,6 +73,7 @@ class BackstageStack(core.Stack):
         # public for the ALB
         # private for the Fargate cluster
         # isolated for aurora db
+        # by default the ecs_pattern used below will setup a public and private set of subnets. 
         vpc = ec2.Vpc(
             self, 
             "ECS-VPC",
