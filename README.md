@@ -45,7 +45,7 @@ The CDK deployment needs to find the backstage app code and its dockerfile to bu
 ### Integrate
 If you want to couple this with your custom backstage application you can create or move the backstage code here.
 
-Either copy or build a backstage app with postgres using `npx @backstage\create-app` into a `./backstage` sub directory in this repo. See this [guide]() at Backstage.io.
+Either copy or build a backstage app with postgres using `npx @backstage\create-app` into a `./backstage` sub directory in this repo. See this [guide](https://backstage.io/docs/getting-started/create-an-app) at [Backstage.io](https://backstage.io/).
 
 If you do this and then want to commit changes to your backstage app along with this infrastructure code you will need to remove the `backstage` line from gitignore.  
 
@@ -60,7 +60,7 @@ Finally, if you set the env var `BACKSTAGE_DIR` to point to where your backstage
 
 
 ## Add Dockerfile and .dockerignore
-Add a dockerfile (and a `.dockerignore`) to the backstage dir as detailed from the [backstage deployment docs](https://backstage.io/docs/getting-started/deployment-other#docker) 
+Add a multi-stage dockerfile (and a `.dockerignore`) to the backstage dir as detailed from the [backstage docker deployment docs](https://backstage.io/docs/getting-started/deployment-docker#multistage-build) 
 
 
 ## Configure Backstage to use Env vars
