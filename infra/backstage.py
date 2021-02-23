@@ -24,6 +24,7 @@ class BackstageStack(core.Stack):
         db_username = props.get("POSTGRES_USER", 'postgres')
         db_port = int(props.get("POSTGRES_PORT", 5432))
         container_port = props.get("CONTAINER_PORT", '7000')
+        container_name = props.get("CONTAINER_NAME", 'backstage')
         backstage_dir = props.get("BACKSTAGE_DIR", './backstage')
         acm_arn = props.get("ACM_ARN", None)
         fqdn = f"{host_name}.{domain_name}"
@@ -156,6 +157,7 @@ class BackstageStack(core.Stack):
                 image=ecs.ContainerImage.from_docker_image_asset(docker_asset), #.from_asset(directory=backstage_dir),
                 container_port=int(container_port),
                 environment = props, # pass in the env vars
+                container_name=container_name
         )
 
         # Easiest way to stand up mult-tier ECS app is with an ecs_pattern,  we are making it HTTPS
