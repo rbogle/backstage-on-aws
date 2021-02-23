@@ -137,7 +137,7 @@ class BackstageStack(core.Stack):
             self,
             "BackstageImage",
             directory=backstage_dir,
-            repository_name="backstage"
+            repository_name=container_name
         )
 
         # Now make the ECS cluster, Task def, and Service
@@ -157,7 +157,8 @@ class BackstageStack(core.Stack):
                 image=ecs.ContainerImage.from_docker_image_asset(docker_asset), #.from_asset(directory=backstage_dir),
                 container_port=int(container_port),
                 environment = props, # pass in the env vars
-                container_name=container_name
+                container_name=container_name,
+            
         )
 
         # Easiest way to stand up mult-tier ECS app is with an ecs_pattern,  we are making it HTTPS
