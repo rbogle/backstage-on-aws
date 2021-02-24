@@ -9,3 +9,6 @@ aws_cdk.aws_certificatemanager
 aws_cdk.aws_route53
 aws_cdk.aws_secretsmanager
 aws_cdk.aws_ssm
+aws_cdk.aws_codebuild
+aws_cdk.aws_codepipeline
+aws_cdk.aws_codepipeline_actions

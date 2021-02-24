@@ -11,6 +11,9 @@ from aws_cdk import (
     aws_secretsmanager as secrets,
     aws_certificatemanager as acm,
     aws_route53 as route53,
+    aws_codebuild as codebuild,
+    aws_codepipeline as codepipeline,
+    aws_codepipeline_actions as actions,
 )
 
 class BackstageStack(core.Stack):
@@ -28,6 +31,14 @@ class BackstageStack(core.Stack):
         backstage_dir = props.get("BACKSTAGE_DIR", './backstage')
         acm_arn = props.get("ACM_ARN", None)
         fqdn = f"{host_name}.{domain_name}"
+
+        # github info for pipeline and backstage
+        github_repo = props.get("GITHUB_REPO")
+        github_org = props.get("GITHUB_ORG")
+        github_secret_name = props.get("GITHUB_SEC_NAME")
+        github_secret_key = props.get("GITHUB_SEC_KEY")
+        github_token = core.SecretValue.secrets_manager(github_secret_name, json_field=github_secret_key)
+        props['GITHUB_TOKEN'] = github_token.to_string()
 
         # hosted zone for ALB and Cert
         # hosted_zone = route53.PublicHostedZone(
@@ -68,8 +79,9 @@ class BackstageStack(core.Stack):
             generate_secret_string=secret_string
         )
 
-        # replace the .env passwd with the generated one
+        # replace the .env pg passwd and github tokens with the generated one
         props['POSTGRES_PASSWORD'] = aurora_creds.secret_value_from_json('password').to_string()
+        
 
         # For additional security you can configure a VPC with subnets of different types ex:
         # public for the ALB
@@ -143,15 +155,6 @@ class BackstageStack(core.Stack):
         # Now make the ECS cluster, Task def, and Service
         ecs_cluster = ecs.Cluster(self, "MyCluster", vpc=vpc)
 
-        # ecs_task_def = ecs.FargateTaskDefinition(
-        #     self,
-        #     "backstageTask",
-        #     cpu=512,
-        #     memory_limit_mib=2048,
-        # )
-
-        # ecs_task_def.add_container()
-
         # this builds the backstage container on deploy and pushes to ECR
         ecs_task_options = ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
                 image=ecs.ContainerImage.from_docker_image_asset(docker_asset), #.from_asset(directory=backstage_dir),
@@ -178,3 +181,74 @@ class BackstageStack(core.Stack):
             enable_ecs_managed_tags = True,
         )  
 
+        ### build a codepipeline for building new images and re-deploying to ecs
+        ### this will use the backstage repo as source to catch canges there
+        ### execute a docker build and push image to ECR
+        ### then execute ECS deployment
+        ### once this pipeline is built we should only need to commit changes 
+        ### to the backstage app repo to deploy and update
+
+        # create the output artifact space for the pipeline
+        source_output = codepipeline.Artifact()
+        build_output = codepipeline.Artifact()
+
+        # setup source to be the backstage app source
+        source_action = actions.GitHubSourceAction(
+            oauth_token= github_token,
+            owner=github_org,
+            repo=github_repo,
+            branch='main',
+            action_name="Github-Source",
+            output=source_output
+        )
+        # make codebuild action to use buildspec.yml and feed in env vars from .env
+        # this will build and push new image to ECR repo
+
+        build_project = codebuild.PipelineProject(
+            self, 
+            "CodebuildProject", 
+            build_spec=codebuild.BuildSpec.from_source_filename('buildspec.yml'),
+            environment=codebuild.BuildEnvironment(build_image=codebuild.LinuxBuildImage.STANDARD_5_0, privileged=True),
+        )
+        policy =  iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEC2ContainerRegistryPowerUser")
+        build_project.role.add_managed_policy(policy)
+
+        # code build action will use docker to build new image and push to ECR
+        # the buildspec.yaml is in the backstage app repo
+        repo_uri = docker_asset.repository.repository_uri
+
+        build_action = actions.CodeBuildAction(
+            action_name="Docker-Build",
+            project=build_project,
+            input=source_output,
+            outputs=[build_output],
+            environment_variables={
+                "REPOSITORY_URI": codebuild.BuildEnvironmentVariable(value=repo_uri),
+                "AWS_REGION": codebuild.BuildEnvironmentVariable(value=props.get("AWS_REGION")),
+                "CONTAINER_NAME": codebuild.BuildEnvironmentVariable(value=props.get("CONTAINER_NAME"))
+            },
+
+        )
+        # ECS deploy action will take file made in build stage and update the service with new image
+        deploy_action = actions.EcsDeployAction(
+            service=ecs_stack.service,
+            action_name="ECS-Deploy",
+            input=build_output,
+        )
+
+        pipeline = codepipeline.Pipeline(self, "fccbackstagepipeline", cross_account_keys=False)
+
+        pipeline.add_stage(
+            stage_name="Source",
+            actions=[source_action]
+        )
+
+        pipeline.add_stage(
+            stage_name="Build",
+            actions=[build_action]
+        )
+
+        pipeline.add_stage(
+            stage_name="Deploy",
+            actions=[deploy_action]
+        )
