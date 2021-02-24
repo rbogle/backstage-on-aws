@@ -4,6 +4,9 @@
 This project uses [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html) to deploy a containerized version of backstage along with the required infrastructure in AWS, to host your own [Backstage](https://backstage.io) service.
 
 It deploys the container into an ECS Fargate cluster and uses an Aurora postgres db for persistence, and puts those behind a application load balancer with a custom domain name.
+Finally it builds a codepipeline/codebuild project which will build a new image from commit to second github repo where your backstage app code resides, and then deploys the new image to the ECS cluster. 
+
+Once this cdk stack is deployed, you only need to update your backstage code to update the current running application. 
 
 > Warning! Deploying this into your AWS account will incur costs! 
 
@@ -18,11 +21,13 @@ It deploys the container into an ECS Fargate cluster and uses an Aurora postgres
   - [Reference](#reference)
 - [Add Dockerfile and .dockerignore](#add-dockerfile-and-dockerignore)
 - [Configure Backstage to use Env vars](#configure-backstage-to-use-env-vars)
+- [Create a Route53 publichostedzone](#create-a-route53-publichostedzone)
+- [Store a github token in AWS Secrets Manager](#store-a-github-token-in-aws-secrets-manager)
 - [Create .env file](#create-env-file)
   - [Postgres config](#postgres-config)
   - [Routing & Discovery](#routing--discovery)
   - [AWS Environment](#aws-environment)
-- [Create a Route53 publichostedzone](#create-a-route53-publichostedzone)
+  - [Github Token Info](#github-token-info)
 - [Initialize and Deploy CDK project](#initialize-and-deploy-cdk-project)
 
 ## Check your prerequisites
@@ -66,6 +71,17 @@ Add a dockerfile (and a `.dockerignore`) to the backstage dir as detailed from t
 ## Configure Backstage to use Env vars
 Configure your `app-config.yaml` and `app-config.production.yaml` files to use ENV vars for critical parameters and secrets
 
+## Create a Route53 publichostedzone
+The cdk stack assumes a pre-existing domain name and hosted zone in route53.
+
+You can change this to generate one on the fly if the domain is registered with AWS already, however its just as easy to setup a new hosted zone via the console. see: [Route53 docs](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)
+
+## Store a github token in AWS Secrets Manager
+The codepipeline deployment needs to connect to the github repository where the backstage app code will live.
+To give the service access to github securely, we prime aws secrets manager with the github token and extract it the deploy time for the infrastructure. 
+This tutorial can show you how to store the token: [Securing Tokens in a serverless pipeline](https://eoins.medium.com/securing-github-tokens-in-a-serverless-codepipeline-dc3a24ddc356)
+
+You could take this further and place all credentials/tokens in secrets manager and extract them at build time. 
 
 ## Create .env file
 Create a dotenv file `.env` in the root of this project with your secrets and parameters to configure both the CDK deployment and to pass them to your backstage app container at runtime.
@@ -91,10 +107,14 @@ The essential variables to define are:
 - TAG_STACK_AUTHOR --> (Optional) defaults to foo.bar@example.com
 - BACKSTAGE_DIR --> (Optional) defaults to ./backstage
 
-## Create a Route53 publichostedzone
-The cdk stack assumes a pre-existing domain name and hosted zone in route53.
+### Github Token Info
+- GITHUB_SECRET_NAME --> (Required) the secret manager secret name
+- GITHUB_SECRET_KEY --> (Required) the key in the secret of which the value is the github token
+- GITHUB_REPO --> (Required) the name of the repo where your backstage app code is kept, without the user or org
+- GITHUB_ORG --> (Required) the user or org where the backstage app repo lives
 
-You can change this to generate one on the fly if the domain is registered with AWS already, however its just as easy to setup a new hosted zone via the console. see: [Route53 docs](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)
+
+
 
 ## Initialize and Deploy CDK project
 This project is set up like a standard Python CDK project.  The initialization

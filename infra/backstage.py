@@ -35,8 +35,8 @@ class BackstageStack(core.Stack):
         # github info for pipeline and backstage
         github_repo = props.get("GITHUB_REPO")
         github_org = props.get("GITHUB_ORG")
-        github_secret_name = props.get("GITHUB_SEC_NAME")
-        github_secret_key = props.get("GITHUB_SEC_KEY")
+        github_secret_name = props.get("GITHUB_SECRET_NAME")
+        github_secret_key = props.get("GITHUB_SECRET_KEY")
         github_token = core.SecretValue.secrets_manager(github_secret_name, json_field=github_secret_key)
         props['GITHUB_TOKEN'] = github_token.to_string()
 
@@ -182,7 +182,7 @@ class BackstageStack(core.Stack):
         )  
 
         ### build a codepipeline for building new images and re-deploying to ecs
-        ### this will use the backstage repo as source to catch canges there
+        ### this will use the backstage app repo as source to catch canges there
         ### execute a docker build and push image to ECR
         ### then execute ECS deployment
         ### once this pipeline is built we should only need to commit changes 
