@@ -1,4 +1,5 @@
 python-dotenv
+pyyaml
 aws_cdk.core
 aws_cdk.aws_ec2
 aws_cdk.aws_ecs

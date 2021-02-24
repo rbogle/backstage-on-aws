@@ -1,4 +1,5 @@
 import json
+import yaml
 from aws_cdk import (
     core, 
     aws_ec2 as ec2,
@@ -39,6 +40,11 @@ class BackstageStack(core.Stack):
         github_secret_key = props.get("GITHUB_SECRET_KEY")
         github_token = core.SecretValue.secrets_manager(github_secret_name, json_field=github_secret_key)
         props['GITHUB_TOKEN'] = github_token.to_string()
+
+        # load in our buildspec file and convert to dict
+        # this way we maintain build separate from app code. 
+        with open(r'./buildspec.yml') as file:
+            build_spec = yaml.full_load(file)
 
         # hosted zone for ALB and Cert
         # hosted_zone = route53.PublicHostedZone(
@@ -208,8 +214,9 @@ class BackstageStack(core.Stack):
         build_project = codebuild.PipelineProject(
             self, 
             "CodebuildProject", 
-            build_spec=codebuild.BuildSpec.from_source_filename('buildspec.yml'),
-            environment=codebuild.BuildEnvironment(build_image=codebuild.LinuxBuildImage.STANDARD_5_0, privileged=True),
+            build_spec=codebuild.BuildSpec.from_object(build_spec),
+            #build_spec=codebuild.BuildSpec.from_source_filename('buildspec.yml'),
+            environment=codebuild.BuildEnvironment(build_image=codebuild.LinuxBuildImage.STANDARD_4_0, privileged=True),
         )
         policy =  iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEC2ContainerRegistryPowerUser")
         build_project.role.add_managed_policy(policy)
