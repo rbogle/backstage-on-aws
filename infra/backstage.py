@@ -25,24 +25,31 @@ class BackstageStack(core.Stack):
         # properties
         host_name = props.get("HOST_NAME", 'backstage')
         domain_name = props.get("DOMAIN_NAME", 'example.com')
+        fqdn = f"{host_name}.{domain_name}"
         db_username = props.get("POSTGRES_USER", 'postgres')
         db_port = int(props.get("POSTGRES_PORT", 5432))
         container_port = props.get("CONTAINER_PORT", '7000')
         container_name = props.get("CONTAINER_NAME", 'backstage')
         backstage_dir = props.get("BACKSTAGE_DIR", './backstage')
         acm_arn = props.get("ACM_ARN", None)
-        fqdn = f"{host_name}.{domain_name}"
-
-        # github info for pipeline and backstage
+        # github info for codepipeline
         github_repo = props.get("GITHUB_REPO")
         github_org = props.get("GITHUB_ORG")
-        github_secret_name = props.get("GITHUB_SECRET_NAME")
-        github_secret_key = props.get("GITHUB_SECRET_KEY")
-        github_token = core.SecretValue.secrets_manager(github_secret_name, json_field=github_secret_key)
-        props['GITHUB_TOKEN'] = github_token.to_string()
+        
+
+        # secretmgr info for github token
+        github_token_secret_name = props.get("GITHUB_TOKEN_SECRET_NAME")
+        # secretmgr info for auth to github users
+        github_auth_secret_name = props.get("GITHUB_AUTH_SECRET_NAME")
+        # secretmgr info for auth to AWS for plugins
+        aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME")
+
+        aws_auth_secret = secrets.Secret.from_secret_name(self, "aws-auth-secret", aws_auth_secret_name)
+        github_auth_secret = secrets.Secret.from_secret_name(self, "github-auth-secret", github_auth_secret_name)
+        github_token_secret = secrets.Secret.from_secret_name(self, "github-token-secret", github_token_secret_name)
 
         # load in our buildspec file and convert to dict
-        # this way we maintain build separate from app code. 
+        # this way we maintain build file as separate from app code. 
         with open(r'./buildspec.yml') as file:
             build_spec = yaml.full_load(file)
 
@@ -81,28 +88,18 @@ class BackstageStack(core.Stack):
         # generate and store password and username
         aurora_creds = secrets.Secret(
             self, 'AuroraCredentialsSecret', 
-            secret_name= "BackstageDBCredentials",
+            secret_name= "backstage-db-auth",
             generate_secret_string=secret_string
         )
 
         # replace the .env pg passwd and github tokens with the generated one
         props['POSTGRES_PASSWORD'] = aurora_creds.secret_value_from_json('password').to_string()
         
-
-        # For additional security you can configure a VPC with subnets of different types ex:
-        # public for the ALB
-        # private for the Fargate cluster
-        # isolated for aurora db
         # by default the ecs_pattern used below will setup a public and private set of subnets. 
         vpc = ec2.Vpc(
             self, 
             "ECS-VPC",
             max_azs=2,
-            # subnet_configuration=[
-            #     {'name': 'Backstage_public','subnet_type' : ec2.SubnetType.PUBLIC},
-            #     {'name': 'Backstage_private', 'subnet_type': ec2.SubnetType.PRIVATE },
-            #     {'name': 'Backstage_isolated', 'subnet_type': ec2.SubnetType.ISOLATED }               
-            # ]
         )
 
         # SubnetGroup uses the private subnets by default this is passed to the aurora cluster
@@ -164,12 +161,19 @@ class BackstageStack(core.Stack):
 
         # this builds the backstage container on deploy and pushes to ECR
         ecs_task_options = ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
-                image=ecs.ContainerImage.from_docker_image_asset(docker_asset), #.from_asset(directory=backstage_dir),
-                container_port=int(container_port),
-                environment = props, # pass in the env vars
-                container_name=container_name,
-            
+            image=ecs.ContainerImage.from_docker_image_asset(docker_asset), #.from_asset(directory=backstage_dir),
+            container_port=int(container_port),
+            environment = props, # pass in the env vars
+            container_name=container_name,
+            secrets={
+                "GITHUB_TOKEN" : ecs.Secret.from_secrets_manager(github_token_secret, field='secret'),
+                "AUTH_GITHUB_CLIENT_ID": ecs.Secret.from_secrets_manager(github_auth_secret, field='id'),
+                "AUTH_GITHUB_CLIENT_SECRET": ecs.Secret.from_secrets_manager(github_auth_secret, field='secret'),
+                "AWS_ACCESS_KEY_ID": ecs.Secret.from_secrets_manager(aws_auth_secret, field='id'),
+                "AWS_ACCESS_KEY_SECRET": ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')
+            }
         )
+        ecs_task_options.execution_role
 
         # Easiest way to stand up mult-tier ECS app is with an ecs_pattern,  we are making it HTTPS
         # and accessible on a DNS name. We give ECS the Security Group for fargate
@@ -201,7 +205,7 @@ class BackstageStack(core.Stack):
 
         # setup source to be the backstage app source
         source_action = actions.GitHubSourceAction(
-            oauth_token= github_token,
+            oauth_token=github_token_secret.secret_value_from_json("secret"),
             owner=github_org,
             repo=github_repo,
             branch='main',
