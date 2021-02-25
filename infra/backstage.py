@@ -44,9 +44,9 @@ class BackstageStack(core.Stack):
         # secretmgr info for auth to AWS for plugins
         aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME")
 
-        aws_auth_secret = secrets.Secret.from_secret_name(self, "aws-auth-secret", aws_auth_secret_name)
-        github_auth_secret = secrets.Secret.from_secret_name(self, "github-auth-secret", github_auth_secret_name)
-        github_token_secret = secrets.Secret.from_secret_name(self, "github-token-secret", github_token_secret_name)
+        aws_auth_secret = secrets.Secret.from_secret_name_v2(self, "aws-auth-secret", aws_auth_secret_name)
+        github_auth_secret = secrets.Secret.from_secret_name_v2(self, "github-auth-secret", github_auth_secret_name)
+        github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
 
         # load in our buildspec file and convert to dict
         # this way we maintain build file as separate from app code. 
