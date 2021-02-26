@@ -36,17 +36,28 @@ class BackstageStack(core.Stack):
         github_repo = props.get("GITHUB_REPO")
         github_org = props.get("GITHUB_ORG")
         
-
+        secret_mapping = dict()
         # secretmgr info for github token
         github_token_secret_name = props.get("GITHUB_TOKEN_SECRET_NAME")
         # secretmgr info for auth to github users
-        github_auth_secret_name = props.get("GITHUB_AUTH_SECRET_NAME")
+        github_auth_secret_name = props.get("GITHUB_AUTH_SECRET_NAME", None)
         # secretmgr info for auth to AWS for plugins
-        aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME")
+        aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME", None)
 
-        aws_auth_secret = secrets.Secret.from_secret_name_v2(self, "aws-auth-secret", aws_auth_secret_name)
-        github_auth_secret = secrets.Secret.from_secret_name_v2(self, "github-auth-secret", github_auth_secret_name)
         github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
+        secret_mapping['GITHUB_TOKEN'] = ecs.Secret.from_secrets_manager(github_token_secret, field='secret')
+
+        # retrieve secrets and add to mapping if the right ENV VARS exists
+        if github_auth_secret_name is not None:
+            github_auth_secret = secrets.Secret.from_secret_name_v2(
+                self, "github-auth-secret", github_auth_secret_name)
+            secret_mapping["AUTH_GITHUB_CLIENT_ID"]= ecs.Secret.from_secrets_manager(github_auth_secret, field='id')
+            secret_mapping["AUTH_GITHUB_CLIENT_SECRET"]= ecs.Secret.from_secrets_manager(github_auth_secret, field='secret')
+        if aws_auth_secret_name is not None:
+            aws_auth_secret = secrets.Secret.from_secret_name_v2(self, "aws-auth-secret", aws_auth_secret_name)
+            secret_mapping["AWS_ACCESS_KEY_ID"]= ecs.Secret.from_secrets_manager(aws_auth_secret, field='id'),
+            secret_mapping["AWS_ACCESS_KEY_SECRET"]= ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')
+        
 
         # load in our buildspec file and convert to dict
         # this way we maintain build file as separate from app code. 
@@ -165,13 +176,7 @@ class BackstageStack(core.Stack):
             container_port=int(container_port),
             environment = props, # pass in the env vars
             container_name=container_name,
-            secrets={
-                "GITHUB_TOKEN" : ecs.Secret.from_secrets_manager(github_token_secret, field='secret'),
-                "AUTH_GITHUB_CLIENT_ID": ecs.Secret.from_secrets_manager(github_auth_secret, field='id'),
-                "AUTH_GITHUB_CLIENT_SECRET": ecs.Secret.from_secrets_manager(github_auth_secret, field='secret'),
-                "AWS_ACCESS_KEY_ID": ecs.Secret.from_secrets_manager(aws_auth_secret, field='id'),
-                "AWS_ACCESS_KEY_SECRET": ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')
-            }
+            secrets=secret_mapping
         )
         ecs_task_options.execution_role
 
