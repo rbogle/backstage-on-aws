@@ -81,12 +81,18 @@ You can change this to generate one on the fly if the domain is registered with 
 
 ## Store a secrets in AWS Secrets Manager
 The codepipeline deployment needs to connect to the github repository where the backstage app code will live.
-To give the service access to github securely, we prime aws secrets manager with the github token and extract it the deploy time for the infrastructure.
+To give the service access to 3rd party apis securely, we bootstrap aws secrets manager with the tokens and extract them at deploy time for the infrastructure.
 
+You will need to stage a github token in secrets and set the appropriate env var to point to the name of the secret in secretmanager. 
+You may also want to add secrets for Github auth and AWS auth as well. The cdk stack will look for those secrets in the env vars detailed below and inject them into the container at runtime as the following variables:
+
+- GITHUB_TOKEN --> looks in the secret named in `GITHUB_TOKEN_SECRET_NAME` for a key name of 'secret'
+- AUTH_GITHUB_CLIENT_ID --> looks in the secret named in `GITHUB_AUTH_SECRET_NAME` for a key name of 'id'
+- AUTH_GITHUB_CLIENT_SECRET --> looks in the secret named in `GITHUB_AUTH_SECRET_NAME` for a key name of 'secret'
+- AWS_ACCESS_KEY_ID --> looks in the secret named in `AWS_AUTH_SECRET_NAME` for a key name of 'id'
+- AWS_ACCESS_KEY_SECRET --> looks in the secret named in `AWS_AUTH_SECRET_NAME` for a key name of 'secret'
 
 This tutorial can show you how to store the token: [Securing Tokens in a serverless pipeline](https://eoins.medium.com/securing-github-tokens-in-a-serverless-codepipeline-dc3a24ddc356)
-
-
 
 ## Create .env file
 Create a dotenv file `.env` in the root of this project with your secrets and parameters to configure both the CDK deployment and to pass them to your backstage app container at runtime. Below are the variables used by cdk, add any others you want your backstage runtime to have. The essential variables for CDK deployment to define are:
