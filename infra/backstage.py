@@ -103,8 +103,9 @@ class BackstageStack(core.Stack):
             generate_secret_string=secret_string
         )
 
-        # replace the .env pg passwd and github tokens with the generated one
-        props['POSTGRES_PASSWORD'] = aurora_creds.secret_value_from_json('password').to_string()
+        # replace the .env pg passwd generated one to share between ECS and Aurora
+        # props['POSTGRES_PASSWORD'] = aurora_creds.secret_value_from_json('password').to_string()
+        secret_mapping['POSTGRES_PASSWORD']=ecs.Secret.from_secrets_manager(aurora_creds, field='password') 
         
         # by default the ecs_pattern used below will setup a public and private set of subnets. 
         vpc = ec2.Vpc(
