@@ -45,18 +45,21 @@ class BackstageStack(core.Stack):
         aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME", None)
 
         github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
-        secret_mapping['GITHUB_TOKEN'] = ecs.Secret.from_secrets_manager(github_token_secret, field='secret')
+        # There is some weirdness here on synth with jsii when casting happens 
+        # using secret_mapping['VAR']=object assignment throws a casting error on synth
+        # so we make this a direct mapping of str,obj with the update() method and the mapping works
+        secret_mapping.update({'GITHUB_TOKEN': ecs.Secret.from_secrets_manager(github_token_secret, field='secret')})
 
         # retrieve secrets and add to mapping if the right ENV VARS exists
         if github_auth_secret_name is not None:
             github_auth_secret = secrets.Secret.from_secret_name_v2(
                 self, "github-auth-secret", github_auth_secret_name)
-            secret_mapping["AUTH_GITHUB_CLIENT_ID"]= ecs.Secret.from_secrets_manager(github_auth_secret, field='id')
-            secret_mapping["AUTH_GITHUB_CLIENT_SECRET"]= ecs.Secret.from_secrets_manager(github_auth_secret, field='secret')
+            secret_mapping.update({'AUTH_GITHUB_CLIENT_ID': ecs.Secret.from_secrets_manager(github_auth_secret, field='id')})
+            secret_mapping.update({"AUTH_GITHUB_CLIENT_SECRET": ecs.Secret.from_secrets_manager(github_auth_secret, field='secret')})
         if aws_auth_secret_name is not None:
             aws_auth_secret = secrets.Secret.from_secret_name_v2(self, "aws-auth-secret", aws_auth_secret_name)
-            secret_mapping["AWS_ACCESS_KEY_ID"]= ecs.Secret.from_secrets_manager(aws_auth_secret, field='id'),
-            secret_mapping["AWS_ACCESS_KEY_SECRET"]= ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')
+            secret_mapping.update({"AWS_ACCESS_KEY_ID": ecs.Secret.from_secrets_manager(aws_auth_secret, field='id')})
+            secret_mapping.update({"AWS_ACCESS_KEY_SECRET": ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')})
         
 
         # load in our buildspec file and convert to dict
@@ -105,7 +108,7 @@ class BackstageStack(core.Stack):
 
         # replace the .env pg passwd generated one to share between ECS and Aurora
         # props['POSTGRES_PASSWORD'] = aurora_creds.secret_value_from_json('password').to_string()
-        secret_mapping['POSTGRES_PASSWORD']=ecs.Secret.from_secrets_manager(aurora_creds, field='password') 
+        secret_mapping.update({'POSTGRES_PASSWORD': ecs.Secret.from_secrets_manager(aurora_creds, field='password')})
         
         # by default the ecs_pattern used below will setup a public and private set of subnets. 
         vpc = ec2.Vpc(
@@ -171,15 +174,23 @@ class BackstageStack(core.Stack):
         # Now make the ECS cluster, Task def, and Service
         ecs_cluster = ecs.Cluster(self, "MyCluster", vpc=vpc)
 
+        # lets create a named role so its easy to find and modify policies for
+        # This is the role which enables the container access to AWS services.
+        task_role = iam.Role(
+            self,
+            "fargate-task-role",
+            role_name='Backstage-Fargate-Task-Role'
+        )
+
         # this builds the backstage container on deploy and pushes to ECR
         ecs_task_options = ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
             image=ecs.ContainerImage.from_docker_image_asset(docker_asset), #.from_asset(directory=backstage_dir),
             container_port=int(container_port),
             environment = props, # pass in the env vars
             container_name=container_name,
-            secrets=secret_mapping
+            secrets = secret_mapping,
+            task_role=task_role
         )
-        ecs_task_options.execution_role
 
         # Easiest way to stand up mult-tier ECS app is with an ecs_pattern,  we are making it HTTPS
         # and accessible on a DNS name. We give ECS the Security Group for fargate
