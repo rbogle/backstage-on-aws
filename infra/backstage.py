@@ -179,7 +179,8 @@ class BackstageStack(core.Stack):
         task_role = iam.Role(
             self,
             "fargate-task-role",
-            role_name='Backstage-Fargate-Task-Role'
+            role_name='Backstage-Fargate-Task-Role',
+            assumed_by= iam.ServicePrincipal("ecs-tasks.amazonaws.com")
         )
 
         # this builds the backstage container on deploy and pushes to ECR
