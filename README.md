@@ -122,9 +122,9 @@ Create a dotenv file `.env` in the root of this project with your secrets and pa
 - GITHUB_ORG --> (Required) the user or org where the backstage app repo lives
 
 ### Secrets to retreive at runtime:
-- AWS_AUTH_SECRET_NAME --> (Required) the name of the AWS Secretmanager Secret which contains key/secret for backstage to acces aws services
-- GITHUB_AUTH_SECRET_NAME --> (Required) the name of the AWS Secretmanager Secret which holds the oauth key/secret for backstage to auth against Github
-- GITHUB_TOKEN_SECRET_NAME --> (Required) the name of the AWS Secretmanager Secret which holds the developer token for backstage to access repos
+- AWS_AUTH_SECRET_NAME --> (Optional) the name of the AWS Secretmanager Secret which contains key/secret for backstage to acces aws services
+- GITHUB_AUTH_SECRET_NAME --> (Optional) the name of the AWS Secretmanager Secret which holds the oauth key/secret for backstage to auth against Github
+- GITHUB_TOKEN_SECRET_NAME --> (Required) the name of the AWS Secretmanager Secret which holds the developer token for both codepipeline and backstage to access repos 
 
 ## Initialize and Deploy CDK project
 This project is set up like a standard Python CDK project.  The initialization
