@@ -68,7 +68,7 @@ Finally, if you set an env var `BACKSTAGE_DIR` to point to where your backstage 
 
 
 ## Add Dockerfile and .dockerignore
-Add a multi-stage dockerfile (and a `.dockerignore`) to the backstage dir as detailed from the [backstage docker deployment docs](https://backstage.io/docs/getting-started/deployment-docker#multistage-build) 
+Add a multi-stage dockerfile (and a `.dockerignore`) to the backstage dir as detailed from the [backstage docker deployment docs](https://backstage.io/docs/deployment/docker#multi-stage-build) 
 
 
 ## Configure Backstage to use Env vars
