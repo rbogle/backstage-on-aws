@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-on-aws
+  description: 'CDK stack project to create infra to run backstage app'
+  annotations:
+    github.com/project-slug: rbogle/backstage-on-aws
+    
+spec:
+  type: service
+  lifecycle: experimental
+  owner: rbogle
