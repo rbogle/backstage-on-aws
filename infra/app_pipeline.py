@@ -94,7 +94,7 @@ class AppPipelineStack(core.Construct):
 
         # ECS deploy actions will take file made in build stage and update the service with new image
 
-        self.pipeline = codepipeline.Pipeline(self, "fccbackstagepipeline", cross_account_keys=False, pipeline_name="backstage-app-pipeline")
+        self.pipeline = codepipeline.Pipeline(self, "backstagepipeline", cross_account_keys=False, pipeline_name="backstage-app-pipeline")
 
         self.pipeline.add_stage(
             stage_name="Source",

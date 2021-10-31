@@ -1,6 +1,6 @@
 
-site_name: "fcc backstage infrastructure"
-site_description: "control center UI service infrastructure"
+site_name: "backstage infrastructure"
+site_description: "backstage service infrastructure"
 
 nav:
   - Introduction: index.md
