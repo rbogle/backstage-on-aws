@@ -1,0 +1,71 @@
+# prod environment deploying to prod account
+# you can add any env variables you like here to pass to the container. 
+# if you want to add secrets and pass them as env vars to the container, 
+# it is recommended you follow the example in stage_resources.py for secret mapping.
+# that method prevents them from being in the clear at runtime.
+
+common: 
+  # postgres config, host gets modified in deployment, db is used by docker-compose
+  POSTGRES_PORT: '5432'
+  POSTGRES_DB: 'backstage'
+  POSTGRES_USER: 'postgres'
+
+  # AWS Environment
+  AWS_REGION: 'us-east-1'
+  AWS_ACCOUNT: ""
+  TAG_STACK_NAME: "backstage-infra"
+  TAG_STACK_PRODUCT: "platform"
+
+
+  # Build and Infra Info 
+  CONTAINER_PORT: '7000'
+  CONTAINER_NAME: 'backstage'
+  DOMAIN_NAME: ""
+  ACM_ARN: ""
+  ECR_REPO_NAME: "backstage"
+  # optional will default to 'dockerfile'
+  DOCKERFILE: 'dockerfile.prod'
+
+  # CodePipeline repo info
+  GITHUB_APP_REPO: ""
+  GITHUB_INFRA_REPO: ""
+  GITHUB_ORG: ''
+  # Github Connection for Code* services
+  CODESTAR_CONN_ARN: ""
+  # Chatbot Connection for Code* notifications
+  CODESTAR_NOTIFY_ARN: ""
+  # can define the following but defaults to 'main'
+  # GITHUB_INFRA_BRANCH
+  # GITHUB_APP_BRANCH
+
+  # github secret lookup, used by app to configure integration to github
+  GITHUB_APP_ARN: ""
+
+  # AWS Secret Name use by APP for auth to aws services.
+  AWS_AUTH_SECRET_NAME: ""
+
+# ENV var overrides per stage
+stages: 
+  test:
+    ### This Config overrides for test stage
+    # Routing & Discovery
+    HOST_NAME: 'test-mybackstage'
+    # Github OAuth Secret Name
+    GITHUB_AUTH_SECRET_NAME: ""
+    # Node Env
+    NODE_ENV: 'development'
+    LOG_LEVEL: 'debug'
+    # stage approval will install a manual approval gate in front of a deployment action
+    STAGE_APPROVAL: False
+
+  prod:
+    ### This Config overrides for prod stage
+    # Routing & Discovery
+    HOST_NAME: 'mybackstage'
+    # github OAuth secret Name 
+    GITHUB_AUTH_SECRET_NAME: ""
+    # stage approval will install a manual approval gate in front of a deployment action
+    STAGE_APPROVAL: True
+    # approval emails to be notified by approval action 
+    APPROVAL_EMAILS:
+      - ""

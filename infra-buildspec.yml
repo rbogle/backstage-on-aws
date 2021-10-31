@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8 
+    commands: 
+        - 'echo "--------INSTALL PHASE--------"'
+        - 'npm install -g aws-cdk'
+        - 'python3 --version'
+        - 'pip3 install -r requirements.txt'
+  build:
+    commands:
+        - 'echo "--------BUILD PHASE--------"'
+        - "cdk synth '*' "
+artifacts:
+    base-directory: cdk.out
+    files: 
+        - '**/*'

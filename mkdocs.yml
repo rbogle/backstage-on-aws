@@ -1,0 +1,11 @@
+
+site_name: "fcc backstage infrastructure"
+site_description: "control center UI service infrastructure"
+
+nav:
+  - Introduction: index.md
+  - Pipelines Description: pipelines.md
+  - Application Infrastructure: stack.md
+  - Settings and Config: settings.md
+  - Boostrap and Setup: bootstrap.md
+  - Deployment: deploy.md

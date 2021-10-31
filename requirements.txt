@@ -1,10 +1,17 @@
 python-dotenv
+pyyaml
 aws_cdk.core
 aws_cdk.aws_ec2
 aws_cdk.aws_ecs
 aws_cdk.aws_ecs_patterns
+aws_cdk.aws_ecr
 aws_cdk.aws_rds
 aws_cdk.aws_certificatemanager
 aws_cdk.aws_route53
 aws_cdk.aws_secretsmanager
 aws_cdk.aws_ssm
+aws_cdk.aws_codebuild
+aws_cdk.aws_codepipeline
+aws_cdk.aws_codepipeline_actions
+aws_cdk.aws_chatbot
+aws_cdk.pipelines 

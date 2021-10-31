@@ -2,7 +2,7 @@
 package-lock.json
 __pycache__
 .pytest_cache
-.env
+.env*
 .venv
 *.egg-info
 backstage
@@ -97,8 +97,8 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
+.env*
 .env
-.env.test
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
