@@ -6,9 +6,9 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region $AWS_REGION --no-include-email)
-      - aws secretsmanager get-secret-value --secret-id $GITHUB_APP_FNDS_ARN --query 'SecretString' --output text > gh-foundations-creds.yaml
-      - aws secretsmanager get-secret-value --secret-id $GITHUB_APP_ISRC_ARN --query 'SecretString' --output text > gh-innersource-creds.yaml
+      - aws secretsmanager get-secret-value --secret-id $GITHUB_APP_ARN --query 'SecretString' --output text > gh-org-app.yaml
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
       - docker pull $REPOSITORY_URI:latest || true
   build:
     commands:
