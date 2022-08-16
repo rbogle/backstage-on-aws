@@ -1,5 +1,6 @@
 # Backstage Infrastructure Stack
-The infrastructure stack to host backstage consists of  
+The infrastructure stack to host backstage consists of:
+
 - ECS Fargate cluster
 - ECS Service definition
 - ECS Task definitions for each stage (Test, Prod)
