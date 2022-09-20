@@ -21,8 +21,7 @@ class AppPipelineStack(core.Construct):
         github_org = props.get("GITHUB_ORG")
         github_branch = props.get("GITHUB_APP_BRANCH", "main")
         codestar_connection_arn = props.get("CODESTAR_CONN_ARN")
-        github_app_fnds_arn = props.get("GITHUB_APP_FNDS_ARN")
-        github_app_isrc_arn = props.get("GITHUB_APP_ISRC_ARN")
+        github_app_arn = props.get("GITHUB_APP_ARN")
         codestar_notify_arn = props.get("CODESTAR_NOTIFY_ARN")
         ### build a codepipeline for building new images and re-deploying to ecs
         ### this will use the backstage app repo as source to catch canges there
@@ -66,7 +65,7 @@ class AppPipelineStack(core.Construct):
         build_project.role.add_managed_policy(policy)
         # add policy to access secret in build
         secrets_policy=iam.PolicyStatement(
-            resources=[github_app_fnds_arn, github_app_isrc_arn],
+            resources=[github_app_arn],
             actions=['secretsmanager:GetSecretValue'],
         )
         build_project.add_to_role_policy(secrets_policy)
@@ -83,8 +82,7 @@ class AppPipelineStack(core.Construct):
             outputs=[self.build_output],
             environment_variables={
                 "BASE_REPO_URI" : codebuild.BuildEnvironmentVariable(value=base_repo_uri),
-                "GITHUB_APP_FNDS_ARN": codebuild.BuildEnvironmentVariable(value=github_app_fnds_arn),
-                "GITHUB_APP_ISRC_ARN": codebuild.BuildEnvironmentVariable(value=github_app_isrc_arn),
+                "GITHUB_APP_ARN": codebuild.BuildEnvironmentVariable(value=github_app_arn),
                 "REPOSITORY_URI": codebuild.BuildEnvironmentVariable(value=repo_uri),
                 "AWS_REGION": codebuild.BuildEnvironmentVariable(value=props.get("AWS_REGION")),
                 "CONTAINER_NAME": codebuild.BuildEnvironmentVariable(value=props.get("CONTAINER_NAME")),
@@ -122,7 +120,6 @@ class AppPipelineStack(core.Construct):
         if approval :
             dps.add_action(
                 actions.ManualApprovalAction(action_name=name+"-stage-approval",notify_emails=emails, run_order=runorder)
-
             )
             runorder+=1
         dps.add_action(

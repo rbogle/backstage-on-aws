@@ -26,19 +26,20 @@ class StageResourceStack(core.Construct):
 
         self.secret_mapping = dict()
         # secretmgr info for github token
-        # github_token_secret_name = props.get("GITHUB_TOKEN_SECRET_NAME")
+        github_token_secret_name = props.get("GITHUB_TOKEN_SECRET_NAME", None)
         # secretmgr info for auth to github users
         github_auth_secret_name = props.get("GITHUB_AUTH_SECRET_NAME", None)
         # secretmgr info for auth to AWS for plugins
         aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME", None)
 
-        # github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
         # # There is some weirdness here on synth with jsii when casting happens 
         # # using secret_mapping['VAR']=object assignment throws a casting error on synth
         # # so we make this a direct mapping of str,obj with the update() method and the mapping works
-        # self.secret_mapping.update({'GITHUB_TOKEN': ecs.Secret.from_secrets_manager(github_token_secret, field='secret')})
-
         # retrieve secrets and add to mapping if the right ENV VARS exists
+
+        if github_token_secret_name is not None:
+            github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
+            self.secret_mapping.update({'GITHUB_TOKEN': ecs.Secret.from_secrets_manager(github_token_secret, field='secret')})
         if github_auth_secret_name is not None:
             github_auth_secret = secrets.Secret.from_secret_name_v2(
                 self, "github-auth-secret", github_auth_secret_name)
