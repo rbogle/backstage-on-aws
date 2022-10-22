@@ -26,19 +26,20 @@ class StageResourceStack(core.Construct):
 
         self.secret_mapping = dict()
         # secretmgr info for github token
-        # github_token_secret_name = props.get("GITHUB_TOKEN_SECRET_NAME")
+        github_token_secret_name = props.get("GITHUB_TOKEN_SECRET_NAME", None)
         # secretmgr info for auth to github users
         github_auth_secret_name = props.get("GITHUB_AUTH_SECRET_NAME", None)
         # secretmgr info for auth to AWS for plugins
         aws_auth_secret_name = props.get("AWS_AUTH_SECRET_NAME", None)
 
-        # github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
         # # There is some weirdness here on synth with jsii when casting happens 
         # # using secret_mapping['VAR']=object assignment throws a casting error on synth
         # # so we make this a direct mapping of str,obj with the update() method and the mapping works
-        # self.secret_mapping.update({'GITHUB_TOKEN': ecs.Secret.from_secrets_manager(github_token_secret, field='secret')})
-
         # retrieve secrets and add to mapping if the right ENV VARS exists
+
+        if github_token_secret_name is not None:
+            github_token_secret = secrets.Secret.from_secret_name_v2(self, "github-token-secret", github_token_secret_name)
+            self.secret_mapping.update({'GITHUB_TOKEN': ecs.Secret.from_secrets_manager(github_token_secret, field='secret')})
         if github_auth_secret_name is not None:
             github_auth_secret = secrets.Secret.from_secret_name_v2(
                 self, "github-auth-secret", github_auth_secret_name)
@@ -52,16 +53,24 @@ class StageResourceStack(core.Construct):
             self.secret_mapping.update({"AWS_SECRET_ACCESS_KEY": ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')})
 
         # hosted zone for ALB and Cert
-        # hosted_zone = route53.PublicHostedZone(
-        #     self, "HostedZone",
-        #     zone_name=domain_name
-        # )
+        # if create_r53:
+        #     self.hosted_zone = route53.PublicHostedZone(
+        #         self, "HostedZone",
+        #         zone_name=domain_name
+        #     )
+        # else:
         # we already have a domain registered and zone hosted in Route53
         # so we do a lookup
         self.hosted_zone = route53.HostedZone.from_lookup(
             self, "hostedzone",
             domain_name=domain_name
         )
+
+        if self.hosted_zone is None:
+            self.hosted_zone = route53.PublicHostedZone(
+                self, "HostedZone",
+                zone_name=domain_name
+            )
 
         # Cert for HTTPS if you specify ACM_ARN in your .env file 
         # we will use a pre-existing cert, else we generate on on-the-fly

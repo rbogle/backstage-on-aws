@@ -48,7 +48,7 @@ See [env-config.yaml](../configs/env-config.yaml), for examples of the github au
 
 
 ## Store Github-App secrets file(s) in Secrets Manager. 
-Instead of using personal access tokens for backstage access the github apis, we have configured the use of a github-app for each of the orgs in github that you want to connect to.  Use of these apps requires providing a crendential configuration file to backstage at run time. The file includes a full PEM certificate that makes it difficult to pass via environment variables, so we store the raw file in Secrets Manager, retrieve the contents in the app pipeline and write that to a file which is copied into the image during build. The ARNs for those secrets are loaded from the `env-config.yaml` file. 
+Instead of using personal access tokens for backstage access the github apis, we have configured the use of a github-app for each of the orgs in github that you want to connect to.  Use of these apps requires providing a crendential configuration file to backstage at run time. The file includes a full PEM certificate that makes it difficult to pass via environment variables, so we store the raw file in Secrets Manager ([see example](https://medium.com/@nilouferbustani/securing-ssh-private-keys-using-aws-secrets-manager-6d93537c1037)) retrieve the contents in the app pipeline and write that to a file which is copied into the image during build. The ARNs for those secrets are loaded from the `env-config.yaml` file. 
 
 To create a new github-app you can use a utility in the backstage app with
 ```bash

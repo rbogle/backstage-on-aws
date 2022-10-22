@@ -12,37 +12,36 @@ common:
 
   # AWS Environment
   AWS_REGION: 'us-east-1'
-  AWS_ACCOUNT: ""
+  AWS_ACCOUNT: "123456789123"
   TAG_STACK_NAME: "backstage-infra"
   TAG_STACK_PRODUCT: "platform"
-
 
   # Build and Infra Info 
   CONTAINER_PORT: '7000'
   CONTAINER_NAME: 'backstage'
-  DOMAIN_NAME: ""
-  ACM_ARN: ""
+  DOMAIN_NAME: "backstage.example.com"
+  ACM_ARN: "arn:aws:acm:region:account:certificate/my-certificate-name"
   ECR_REPO_NAME: "backstage"
   # optional will default to 'dockerfile'
   DOCKERFILE: 'dockerfile.prod'
 
   # CodePipeline repo info
-  GITHUB_APP_REPO: ""
-  GITHUB_INFRA_REPO: ""
-  GITHUB_ORG: ''
+  GITHUB_APP_REPO: "myapprepo"
+  GITHUB_INFRA_REPO: "myinfrarepo"
+  GITHUB_ORG: 'myorg'
   # Github Connection for Code* services
-  CODESTAR_CONN_ARN: ""
+  CODESTAR_CONN_ARN: "arn:aws:codestar:region:account:project/resource-specifier"
   # Chatbot Connection for Code* notifications
-  CODESTAR_NOTIFY_ARN: ""
+  CODESTAR_NOTIFY_ARN: "arn:aws:chatbot:region:account:chat-configuration/slack-channel/myslackchannel"
   # can define the following but defaults to 'main'
   # GITHUB_INFRA_BRANCH
   # GITHUB_APP_BRANCH
 
   # github secret lookup, used by app to configure integration to github
-  GITHUB_APP_ARN: ""
+  GITHUB_APP_ARN: "arn:aws:secretsmanager:region:account:secret:mysecret"
 
   # AWS Secret Name use by APP for auth to aws services.
-  AWS_AUTH_SECRET_NAME: ""
+  AWS_AUTH_SECRET_NAME: "myawsauthsecret"
 
 # ENV var overrides per stage
 stages: 
@@ -51,7 +50,7 @@ stages:
     # Routing & Discovery
     HOST_NAME: 'test-mybackstage'
     # Github OAuth Secret Name
-    GITHUB_AUTH_SECRET_NAME: ""
+    GITHUB_AUTH_SECRET_NAME: "test-github-auth-secret"
     # Node Env
     NODE_ENV: 'development'
     LOG_LEVEL: 'debug'
@@ -63,9 +62,9 @@ stages:
     # Routing & Discovery
     HOST_NAME: 'mybackstage'
     # github OAuth secret Name 
-    GITHUB_AUTH_SECRET_NAME: ""
+    GITHUB_AUTH_SECRET_NAME: "prod-github-auth-secret"
     # stage approval will install a manual approval gate in front of a deployment action
     STAGE_APPROVAL: True
     # approval emails to be notified by approval action 
     APPROVAL_EMAILS:
-      - ""
+      - "devops@example.com"

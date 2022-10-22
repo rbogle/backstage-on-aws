@@ -21,7 +21,8 @@ stacks = [
     stack_name
 ]
 
-# Using a hosted dns zone requires specifying account and region 
+# Using a hosted dns zone requires specifying account and region, 
+# you will need active credentials for this account to synth/deploy
 env =core.Environment(account=props.get('AWS_ACCOUNT'), region=props.get('AWS_REGION', 'us-east-1'))
 
 app = core.App()
