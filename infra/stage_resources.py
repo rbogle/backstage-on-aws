@@ -53,16 +53,24 @@ class StageResourceStack(core.Construct):
             self.secret_mapping.update({"AWS_SECRET_ACCESS_KEY": ecs.Secret.from_secrets_manager(aws_auth_secret, field='secret')})
 
         # hosted zone for ALB and Cert
-        # hosted_zone = route53.PublicHostedZone(
-        #     self, "HostedZone",
-        #     zone_name=domain_name
-        # )
+        # if create_r53:
+        #     self.hosted_zone = route53.PublicHostedZone(
+        #         self, "HostedZone",
+        #         zone_name=domain_name
+        #     )
+        # else:
         # we already have a domain registered and zone hosted in Route53
         # so we do a lookup
         self.hosted_zone = route53.HostedZone.from_lookup(
             self, "hostedzone",
             domain_name=domain_name
         )
+
+        if self.hosted_zone is None:
+            self.hosted_zone = route53.PublicHostedZone(
+                self, "HostedZone",
+                zone_name=domain_name
+            )
 
         # Cert for HTTPS if you specify ACM_ARN in your .env file 
         # we will use a pre-existing cert, else we generate on on-the-fly
